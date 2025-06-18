@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FriendShip extends Model
 {
-    protected $table = 'friends';
+    protected $table = 'friendships';
 
     protected $fillable = [
         'user_id',

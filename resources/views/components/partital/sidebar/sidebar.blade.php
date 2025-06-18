@@ -18,6 +18,6 @@
     </div>
 
     <x-list-cart.user-list :users="$friends" />
-    <div id="searchResults" class="users-list"></div>
+    {{-- <div id="searchResults" class="users-list"></div> --}}
 
 </div>
