@@ -377,6 +377,8 @@
         }
 
         .users-list {
+                max-height: calc(100vh - 150px); /* 150px là tổng chiều cao header + search */
+
             flex: 1;
             padding: 20px;
             padding-top: 0;
@@ -504,7 +506,7 @@
             position: absolute;
             top: 100%;
             right: 0;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(236, 234, 234, 0.9);
             backdrop-filter: blur(20px);
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -895,14 +897,45 @@
             }
 
         }
+
+        .modal-content {
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-title {
+            font-weight: bold;
+        }
+
+        .modal-body {
+            background-color: #ffffff;
+        }
+
+        .modal-footer {
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
+        }
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<!-- PusherJS CDN -->
-<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+    <!-- PusherJS CDN -->
+    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
 
-<!-- Laravel Echo -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.11.1/echo.iife.js"></script>
+    <!-- Laravel Echo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.11.1/echo.iife.js"></script>
+
+    <!-- Bootstrap JS (v5) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="..."
+        crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
 
 </head>
 

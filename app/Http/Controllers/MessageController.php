@@ -38,7 +38,6 @@ class MessageController extends Controller
             $request->input('metadata', [])
         );
         event(new \App\Events\MessageSent($message, $conversationId));
-        Log::info('🎯 Event đã được bắn', ['conversationId' => $conversationId, 'message' => $message]);
 
 
         return response()->json($message);

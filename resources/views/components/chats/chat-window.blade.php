@@ -5,10 +5,10 @@
         <div class="chat-header-left">
             <div>
                 <h3>
-                    {{ $conversation->type === 'private' ? 'Trò chuyện riêng' : ($conversation->name ?? 'Phòng chat') }}
+                    {{ $conversation->name }}
                 </h3>
                 <div class="chat-info">
-                    {{ count($conversation->participants) }} thành viên đang hoạt động
+                    {{-- {{ count($conversation->participants) }} thành viên đang hoạt động --}}
                 </div>
             </div>
         </div>

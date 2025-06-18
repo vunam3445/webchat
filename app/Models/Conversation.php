@@ -37,8 +37,8 @@ class Conversation extends Model
     public function participants()
     {
         return $this->belongsToMany(User::class, 'conversation_user')
-            ->withPivot('joined_at', 'role')
-            ->withTimestamps();
+            ->withPivot('joined_at', 'role');
+           
     }
 
     public function messages()
@@ -55,4 +55,10 @@ class Conversation extends Model
     {
         return $this->participants(); // alias cho dễ dùng
     }
+
+    public function latestMessage()
+{
+    return $this->hasOne(Message::class)->latestOfMany();
+}
+
 }

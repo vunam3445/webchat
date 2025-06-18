@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('user_id');
             $table->timestamp('joined_at')->nullable();
             $table->enum('role', ['member', 'admin'])->default('member');
-
+            $table->timestamps();
             $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

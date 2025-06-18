@@ -15,7 +15,6 @@ Route::prefix('auth')->middleware(['web'])->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
     Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth');
-
 });
 Route::get('/check-login', function () {
     return Auth::check() ? 'Logged in' : 'Not logged in';
@@ -26,14 +25,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('conversations', ConversationController::class)->only([
         'index',
         'store',
-       
+
         'destroy'  // list, create, detail, delete
     ]);
     // Tìm kiếm người dùng qua số điện thoại (search user by phone)
     Route::get('/users/search', [UserController::class, 'search'])->name('users.search');
 
 
-     // Gửi lời mời kết bạn
+    // Gửi lời mời kết bạn
     Route::post('/friends/request', [FriendshipController::class, 'sendRequest']);
 
     // Chấp nhận lời mời kết bạn
@@ -48,13 +47,15 @@ Route::middleware('auth')->group(function () {
     // Lấy danh sách lời mời kết bạn đang chờ
     Route::get('/friends/pending', [FriendshipController::class, 'getPendingRequests']);
 
+
+    Route::post('/conversations/group', [ConversationController::class, 'createGroup'])->name('conversations.createGroup');
+    Route::get('/conversations/group/{id}', [ConversationController::class, 'getGroupConversation'])->name('conversations.getGroupConversation');
+
     Route::get('/conversations/{id}/messages', [MessageController::class, 'getMessages']);
     Route::post('/conversations/{id}/messages', [MessageController::class, 'send']);
-    Route::get('/conversations/{id}',[ConversationController::class, 'getConversation'])->name('conversations.getConversation');
+    Route::get('/conversations/{id}', [ConversationController::class, 'getConversation'])->name('conversations.getConversation');
 
-
-Broadcast::channel('chat.{conversationId}', function ($user, $conversationId) {
-    return true; // hoặc kiểm tra quyền truy cập nếu cần
-});
-
+    Broadcast::channel('chat.{conversationId}', function ($user, $conversationId) {
+        return true; // hoặc kiểm tra quyền truy cập nếu cần
+    });
 });

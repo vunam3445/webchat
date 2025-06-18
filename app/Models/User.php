@@ -9,6 +9,7 @@ use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\MessageRead;
 use App\Models\Call;
+use Domain\Friendship\Entity\Friendship;
 use Laravel\Sanctum\HasApiTokens;  // thêm use này
 
 class User extends Authenticatable
@@ -86,13 +87,13 @@ class User extends Authenticatable
     // Danh sách lời mời do user gửi
     public function sentFriendRequests()
     {
-        return $this->hasMany(Friend::class, 'user_id');
+        return $this->hasMany(Friendship::class, 'user_id');
     }
 
     // Danh sách lời mời mà user nhận
     public function receivedFriendRequests()
     {
-        return $this->hasMany(Friend::class, 'friend_id');
+        return $this->hasMany(Friendship::class, 'friend_id');
     }
 
     // Danh sách bạn bè đã chấp nhận
