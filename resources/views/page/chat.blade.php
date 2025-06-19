@@ -16,6 +16,69 @@
 @endsection
 @section('script')
     <script>
+        const input = document.getElementById('searchInput');
+        const modal = document.getElementById('searchModal');
+        const container = document.getElementById('resultSearch');
+        const closeModalBtn = document.getElementById('closeModal');
+
+        input?.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                const keyword = input.value.trim();
+                if (!keyword) return;
+
+                axios.get('/users/search', {
+                    params: {
+                        keyword
+                    }
+                }).then(response => {
+                    const users = response.data;
+                    container.innerHTML = '';
+
+                    if (!Array.isArray(users) || users.length === 0) {
+                        container.innerHTML = '<div class="no-results">Không có kết quả nào</div>';
+                    } else {
+                        users.forEach(user => {
+                            container.innerHTML += `
+                        <div class="user-item" style="padding: 10px; border-bottom: 1px solid #ddd;">
+                            <strong>${user.name}</strong><br>
+                            <button class="add-friend-btn" data-id="${user.id}">Kết bạn</button>
+                        </div>`;
+                        });
+                    }
+
+                    modal.classList.remove('hidden'); // 🔥 Show modal
+
+                    document.querySelectorAll('.add-friend-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const friendId = this.getAttribute('data-id');
+                            axios.post('/friends/request', {
+                                friend_id: friendId
+                            }).then(() => {
+                                this.textContent = 'Đã gửi';
+                                this.disabled = true;
+                            }).catch(() => alert('Gửi lời mời kết bạn thất bại!'));
+                        });
+                    });
+                }).catch(error => {
+                    container.innerHTML = '<div class="no-results">Không có kết quả nào</div>';
+                    modal.classList.remove('hidden');
+                });
+            }
+        });
+
+        // ❌ Đóng modal khi ấn nút X
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // ❌ Đóng modal khi ấn ra ngoài nội dung
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+
+
         const messagesContainer = document.getElementById('messagesContainer');
         const typingIndicator = document.getElementById('typingIndicator');
         const onlineCount = document.getElementById('onlineCount');
@@ -53,6 +116,7 @@
                     ${isOwn ? 'B' : selectedUser.avatar}
                 </div>
                 <div class="message-content">
+                    <span class="message-sender-name">${isOwn ? 'Bạn' : selectedUser.name}</span>
                     <div class="message-bubble">${text}</div>
                     <div class="message-time">${getCurrentTime()}</div>
                 </div>
@@ -132,9 +196,10 @@
 
             Echo.channel('chat.' + conversationId)
                 .listen('MessageSent', (e) => {
-                    console.log('🎯 Nhận tin nhắn realtime:', e);
+                    // console.log('🎯 Nhận tin nhắn realtime:', e);
                     if (e.sender_id !== '{{ auth()->id() }}') {
                         addMessage(e.content, false, {
+                            name: e.name,
                             avatar: `<img src="/storage/${e.avatar}">`,
                             gradient: 'linear-gradient(45deg, #A8EDEA, #FED6E3)',
                         });
@@ -253,6 +318,7 @@
 
         function logout() {
             if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                window.location.href = '/auth/logout';
                 alert('Đã đăng xuất thành công!');
             }
             document.getElementById('profileDropdown').classList.remove('show');
@@ -263,15 +329,125 @@
             alert('Tính năng tạo nhóm sẽ được triển khai sau!');
         }
 
-        function showGroupInfo() {
-            document.getElementById('groupInfoModal').classList.add('show');
-            document.getElementById('chatMenu').classList.remove('show');
+        function showGroupInfo(conversationId) {
+            const modal = document.getElementById('groupInfoModal');
+
+            // Gọi API lấy thông tin nhóm
+            axios.get(`/conversations/${conversationId}/info`)
+                .then(response => {
+                    const data = response.data;
+
+                    // Cập nhật thông tin nhóm
+                    modal.querySelector('.group-name').textContent = data.name || 'Nhóm chưa có tên';
+                    modal.querySelector('.group-description').textContent = data.description || 'Chưa có mô tả';
+                    modal.querySelector('.group-avatar').textContent = data.name?.charAt(0).toUpperCase() || 'G';
+
+                    // Xử lý thành viên
+                    const membersContainer = modal.querySelector('.members-section');
+                    const memberItems = data.participants.map(member => `
+    <div class="member-item">
+        <div class="user-avatar" style="background: linear-gradient(45deg, #A8EDEA, #FED6E3);">
+            ${member.name.charAt(0).toUpperCase()}
+        </div>
+        <div class="user-info">
+            <div class="name">${member.id === data.current_user_id ? 'Bạn' : member.name}</div>
+            
+        </div>
+        ${member.id !== data.current_user_id ? `
+                        <button class="remove-member-btn" onclick="removeMember(this, '${member.id}')">Xóa</button>` : ''}
+    </div>
+`).join('');
+
+                    // Tìm đúng phần member list để đổ
+                    membersContainer.innerHTML = `
+                <div class="section-title">
+                    Thành viên <span class="user-count">(${data.participants.length})</span>
+                    <button class="create-group-btn" style="font-size: 12px; padding: 5px 10px;"
+                        onclick="showAddMember('${data.id}')">+ Thêm</button>
+                </div>
+                ${memberItems}
+            `;
+
+                    // Hiển thị modal
+                    modal.classList.add('show');
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy thông tin nhóm:', error);
+                    alert('Không thể tải thông tin nhóm!');
+                });
         }
 
+
         function showAddMember() {
-            alert('Tính năng thêm thành viên sẽ được triển khai sau!');
+            document.getElementById('addMemberModal').classList.remove('hidden');
+            document.getElementById('groupInfoModal').classList.remove('show');
             document.getElementById('chatMenu').classList.remove('show');
         }
+        document.getElementById('closeAddMemberModal')?.addEventListener('click', () => {
+            document.getElementById('addMemberModal').classList.add('hidden');
+        });
+        // Đóng khi click ra ngoài modal content
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('addMemberModal');
+            if (event.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+        // Bắt sự kiện Enter trong input tìm kiếm
+        document.getElementById('memberSearchInput')?.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                const keyword = this.value.trim();
+                if (!keyword) return;
+
+                axios.get('/users/search', {
+                    params: {
+                        keyword
+                    }
+                }).then(response => {
+                    const users = response.data;
+                    const resultDiv = document.getElementById('memberSearchResult');
+                    resultDiv.innerHTML = '';
+
+                    if (!Array.isArray(users) || users.length === 0) {
+                        resultDiv.innerHTML =
+                            '<div class="text-muted">Không tìm thấy người dùng nào.</div>';
+                    } else {
+                        users.forEach(user => {
+                            resultDiv.innerHTML += `
+                        <div class="d-flex align-items-center justify-content-between border-bottom py-2">
+                            <div>
+                                <div><strong>${user.name}</strong></div>
+                                <div class="text-muted small">${user.phone || 'Không có SĐT'}</div>
+                            </div>
+                            <button class="btn btn-sm btn-success add-btn" data-id="${user.id}">Thêm</button>
+                        </div>
+                    `;
+                        });
+
+                        document.querySelectorAll('.add-btn').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const userId = this.getAttribute('data-id');
+                                // Gọi API thêm user vào group
+                                axios.post(`/conversations/${conversationId}/add-members`, {
+                                    user_ids: [userId] // gửi đúng kiểu mảng
+                                }).then(() => {
+                                    this.textContent = 'Đã thêm';
+                                    this.classList.remove('btn-success');
+                                    this.classList.add('btn-secondary');
+                                    this.disabled = true;
+                                }).catch(() => {
+                                    alert('Thêm thành viên thất bại.');
+                                });
+                            });
+                        });
+                    }
+                }).catch(err => {
+                    console.error(err);
+                    alert('Lỗi tìm kiếm.');
+                });
+            }
+        });
+
 
         function showMediaFiles() {
             alert('Tính năng xem file & media sẽ được triển khai sau!');
@@ -295,17 +471,23 @@
             document.getElementById(modalId).classList.remove('show');
         }
 
-        function removeMember(button) {
-            const memberItem = button.closest('.member-item');
-            const memberName = memberItem.querySelector('.name').textContent;
+        function removeMember(button, userId) {
+            // thay bằng biến thực tế bạn đang có
 
-            if (confirm(`Bạn có chắc chắn muốn xóa ${memberName} khỏi nhóm?`)) {
-                memberItem.style.opacity = '0';
-                setTimeout(() => {
-                    memberItem.remove();
-                }, 300);
-            }
+            if (!confirm('Bạn có chắc chắn muốn xóa thành viên này khỏi nhóm?')) return;
+
+            axios.delete(`/conversations/${conversationId}/members/${userId}`)
+                .then(response => {
+                    alert(response.data.message || 'Đã xoá');
+                    // Xoá phần tử khỏi DOM
+                    button.closest('.member-item').remove();
+                })
+                .catch(error => {
+                    console.error('Lỗi xoá thành viên:', error);
+                    alert('Xóa thành viên thất bại!');
+                });
         }
+
 
         function changeGroupName() {
             const newName = prompt('Nhập tên mới cho nhóm:', 'Phòng chat chung');
@@ -347,97 +529,7 @@
         messageInput.focus();
 
 
-        document.getElementById('searchInput').addEventListener('keyup', function(event) {
-            if (event.key === 'Enter') {
-                const keyword = event.target.value;
-                if (keyword.trim() === '') {
 
-                    return;
-                }
-                axios.get('/users/search', {
-                        params: {
-                            keyword
-                        }
-                    })
-                    .then(response => {
-                        const users = response.data;
-                        const container = document.getElementById('users-list');
-                        container.innerHTML = ''; // Clear old results
-                        console.log('users:', users);
-                        console.log('Array.isArray(users):', Array.isArray(users));
-                        console.log('users.length:', users.length);
-                        if (!Array.isArray(users) || users.length === 0) {
-                            container.innerHTML = '<div class="no-results">Không có kết quả nào</div>';
-                            return;
-                        }
-
-                        users.forEach(user => {
-                            const userItem = `
-            <div class="user-item">
-                <div class="user-avatar" style="background: ${user.avatar_color || '#ccc'}">
-                    ${user.name.charAt(0).toUpperCase()}
-                </div>
-                <div class="user-info">
-                    <div class="name">${user.name}</div>
-                    <div class="status">${user.status || 'Đang hoạt động'}</div>
-                </div>
-<button class = 'add-friend-btn'data-id="${user.id}" style="
-            padding: 6px 12px;
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            opacity: 1;
-            transform: translateX(20px);
-            position: absolute;
-            right: 28px;
-        ">Kết bạn</button>            </div>
-        `;
-                            container.innerHTML += userItem;
-                        });
-
-                        // ✅ Gán sự kiện sau khi các nút đã được thêm vào DOM
-                        document.querySelectorAll('.add-friend-btn').forEach(btn => {
-                            btn.addEventListener('click', function(e) {
-                                e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
-
-                                const friendId = this.getAttribute('data-id');
-                                const userName = this.parentElement.querySelector('.name')
-                                    .textContent;
-
-                                // Gọi API gửi lời mời kết bạn
-                                axios.post('/friends/request', {
-                                        friend_id: friendId
-                                    })
-                                    .then(() => {
-                                        this.textContent = 'Đã gửi';
-                                        this.style.background =
-                                            'linear-gradient(135deg, #666, #888)';
-                                        this.disabled = true;
-
-                                        console.log(
-                                            `Đã gửi lời mời kết bạn tới ${userName}`);
-                                    })
-                                    .catch(error => {
-                                        console.error('Gửi lời mời kết bạn thất bại:',
-                                            error);
-                                        alert('Gửi lời mời kết bạn thất bại!');
-                                    });
-                            });
-                        });
-                    })
-                    .catch(error => {
-                        const container = document.getElementById('searchResults');
-                        container.innerHTML = '<div class="no-results">Không có kết quả nào</div>';
-                    });
-
-            }
-
-        });
 
 
         // Xử lý click vào user item

@@ -377,7 +377,8 @@
         }
 
         .users-list {
-                max-height: calc(100vh - 150px); /* 150px là tổng chiều cao header + search */
+            max-height: calc(100vh - 150px);
+            /* 150px là tổng chiều cao header + search */
 
             flex: 1;
             padding: 20px;
@@ -418,7 +419,7 @@
             transform: translateX(5px);
         }
 
-        .user-avatar {
+        .user-avatar img {
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -430,13 +431,24 @@
             font-weight: bold;
             font-size: 16px;
         }
-
+        .message-avatar img{
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
         .user-info {
             flex: 1;
         }
 
         .user-info .name {
-            color: white;
+            color: rgb(1, 1, 1);
             font-weight: 500;
             margin-bottom: 2px;
         }
@@ -920,7 +932,76 @@
             background-color: #f5f5f5;
             border-top: 1px solid #ddd;
         }
+
+        /* Nền mờ */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 30, 30, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Ẩn modal */
+        .custom-modal.hidden {
+            display: none;
+        }
+
+        /* Khung nội dung */
+        .custom-modal-content {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            padding: 25px 30px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        /* Animation mở modal */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Nút đóng (X) */
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 22px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        /* Danh sách kết quả */
+        .result-search {
+            margin-top: 15px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
     </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- PusherJS CDN -->
@@ -933,7 +1014,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="..."
         crossorigin="anonymous"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 
 
