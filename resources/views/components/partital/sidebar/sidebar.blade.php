@@ -19,5 +19,16 @@
 
     <x-list-cart.user-list :users="$friends" />
     {{-- <div id="searchResults" class="users-list"></div> --}}
+    <!-- Modal kết quả tìm kiếm -->
+
 
 </div>
+<!-- Modal Wrapper -->
+<div id="searchModal" class="custom-modal hidden">
+    <div class="custom-modal-content">
+        <span class="close-modal" id="closeModal">&times;</span>
+        <h3>Kết quả tìm kiếm</h3>
+        <div id="resultSearch" class="result-search"></div>
+    </div>
+</div>
+

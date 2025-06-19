@@ -58,25 +58,28 @@ class ElquentConversationRepository implements ConversationRepositoryInterface
 
     public function findConversation(string $conversationId): ?Conversation
     {
-        $conversation = EloquentConversation::find($conversationId);
+        $conversation = EloquentConversation::with('users')->find($conversationId);
         if (!$conversation) return null;
 
-        $userIds = $conversation->participants()->pluck('users.id')->toArray();
-        if ($conversation->type === 'private') {
-            // Lấy tên người không phải là user hiện tại
-            $friend = $conversation->users->firstWhere('id', '!=', Auth::id());
-            $name = $friend?->name ?? 'Unknown';
-        } else {
-            // Nếu là group, dùng tên nhóm
-            $name = $conversation->name ?? 'Group Chat';
-        }
+        // Dữ liệu người dùng (id, name, avatar)
+        $participants = $conversation->users->map(fn($user) => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'avatar' => $user->avatar,
+        ])->toArray();
+
+        $name = $conversation->type === 'private'
+            ? $conversation->users->firstWhere('id', '!=', Auth::id())?->name ?? 'Unknown'
+            : ($conversation->name ?? 'Group Chat');
+
         return new Conversation(
             id: $conversation->id,
             type: $conversation->type,
             name: $name,
-            participants: $userIds
+            participants: $participants // trả về chi tiết thay vì chỉ id
         );
     }
+
 
     // ConversationRepository.php
     public function findPrivateConversationBetween(string $userId1, string $userId2): ?Conversation
@@ -175,39 +178,38 @@ class ElquentConversationRepository implements ConversationRepositoryInterface
     }
 
     public function getConversationsByUserId(string $userId): array
-{
-    $conversations = EloquentConversation::with(['users', 'latestMessage'])
-        ->whereHas('participants', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })
-        ->get()
-        ->sortByDesc(fn($conversation) => optional($conversation->latestMessage)->created_at);
+    {
+        $conversations = EloquentConversation::with(['users', 'latestMessage'])
+            ->whereHas('participants', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->get()
+            ->sortByDesc(fn($conversation) => optional($conversation->latestMessage)->created_at);
 
-    $result = [];
+        $result = [];
 
-    foreach ($conversations as $conversation) {
-        if ($conversation->type === 'private') {
-            $friend = $conversation->users->firstWhere('id', '!=', $userId);
-            if (!$friend) continue;
+        foreach ($conversations as $conversation) {
+            if ($conversation->type === 'private') {
+                $friend = $conversation->users->firstWhere('id', '!=', $userId);
+                if (!$friend) continue;
 
-            $result[] = [
-                'id' => $friend->id, // Trả về ID của bạn (friend)
-                'type' => 'private',
-                'name' => $friend->name,
-                'avatar' => $friend->avatar,
-            ];
-        } else {
-            $result[] = [
-                'id' => $conversation->id,
-                'type' => 'group',
-                'name' => $conversation->name ?? 'Group Chat',
-                'conversation_id' => $conversation->id,
-                // 'avatar' => $conversation->avatar ?? 'group-default.png'
-            ];
+                $result[] = [
+                    'id' => $friend->id, // Trả về ID của bạn (friend)
+                    'type' => 'private',
+                    'name' => $friend->name,
+                    'avatar' => $friend->avatar,
+                ];
+            } else {
+                $result[] = [
+                    'id' => $conversation->id,
+                    'type' => 'group',
+                    'name' => $conversation->name ?? 'Group Chat',
+                    'conversation_id' => $conversation->id,
+                    // 'avatar' => $conversation->avatar ?? 'group-default.png'
+                ];
+            }
         }
+
+        return array_values($result);
     }
-
-    return array_values($result);
-}
-
 }

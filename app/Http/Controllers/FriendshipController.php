@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use Application\Friendship\FriendService;
 use Illuminate\Http\Request;
+use Application\Conversation\ConversationService;
+
 use Illuminate\Support\Facades\Auth;
 class FriendshipController extends Controller
 {
     private FriendService $friendService;
+    private ConversationService $conversationService;
 
-    public function __construct(FriendService $friendService)
+    public function __construct(FriendService $friendService, ConversationService $conversationService)
     {
         $this->friendService = $friendService;
+        $this->conversationService = $conversationService;
     }
 
     public function sendRequest(Request $request)
@@ -39,6 +43,7 @@ class FriendshipController extends Controller
             return response()->json(['error' => 'Unauthorized.'], 401);
         }
         $this->friendService->acceptRequest($userId, Auth::id());
+        $conversation = $this->conversationService->create(Auth::id(), $userId);
         return response()->json(['message' => 'Request accepted.']);
     }
 

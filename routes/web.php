@@ -52,9 +52,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/conversations/group/{id}', [ConversationController::class, 'getGroupConversation'])->name('conversations.getGroupConversation');
 
     Route::get('/conversations/{id}/messages', [MessageController::class, 'getMessages']);
+    Route::get('/conversations/{id}/info', [ConversationController::class, 'findConversation'])->name('conversations.findConversation');
+
     Route::post('/conversations/{id}/messages', [MessageController::class, 'send']);
     Route::get('/conversations/{id}', [ConversationController::class, 'getConversation'])->name('conversations.getConversation');
+    Route::delete('/conversations/{id}/members/{memberId}', [ConversationController::class, 'removeMember'])->name('conversations.removeMember');
 
+    Route::post('/conversations/{conversationId}/add-members', [ConversationController::class, 'addMembers']);
     Broadcast::channel('chat.{conversationId}', function ($user, $conversationId) {
         return true; // hoặc kiểm tra quyền truy cập nếu cần
     });
