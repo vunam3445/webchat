@@ -7,7 +7,7 @@
         @if ($user['type'] === 'private')
             <img src="{{ asset('storage/' . $user['avatar']) }}" alt="avatar">
         @else
-            <img src="{{ asset('images/group-icon.png') }}" alt="group" style="border-radius: 10px;">
+            <img src="{{ asset('storage/group-icon.png') }}" alt="group" style="border-radius: 10px;">
         @endif
     </div>
 

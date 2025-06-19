@@ -9,7 +9,7 @@
          <!-- Notifications -->
          <div class="notification-icon" onclick="toggleNotifications()">
              🔔
-             <div class="notification-badge" id="notificationBadge">3</div>
+             {{-- <div class="notification-badge" id="notificationBadge">3</div> --}}
              {{-- <div class="dropdown" id="notificationsDropdown">
                     <div class="notification-item">
                         <div class="notification-avatar">T</div>
@@ -64,7 +64,7 @@
      <div class="modal-dialog">
          <div class="modal-content">
              <form id="createGroupForm">
-                @csrf
+                 @csrf
                  <div class="modal-header">
                      <h5 class="modal-title" id="createGroupModalLabel">Tạo nhóm chat mới</h5>
                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
@@ -93,3 +93,4 @@
          </div>
      </div>
  </div>
+ 

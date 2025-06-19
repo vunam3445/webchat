@@ -36,7 +36,7 @@ class ConversationController extends Controller
     {
         $friend_id = $id;
         $friends = $this->conversationService->getConversationsByUserId(Auth::id());
-
+        Log::info('freind : ',$friends);
         $friendsPendingRequests = $this->friendService->getPendingRequests(Auth::id());
         $conversation = $this->conversationService->create(Auth::id(), $friend_id);
         $messages = $this->messageService->getMessages($conversation->id);
@@ -107,5 +107,14 @@ class ConversationController extends Controller
         $messages = $this->messageService->getMessages($conversationId);
 
         return view('page.chat-group', compact('conversation', 'messages'));
+    }
+
+    public function findConversation(string $conversationId)
+    {
+        $conversation = $this->conversationService->findConversationById($conversationId);
+        if (!$conversation) {
+            return response()->json(['error' => 'Conversation not found'], 404);
+        }
+        return response()->json($conversation);
     }
 }
