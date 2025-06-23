@@ -27,15 +27,7 @@ class EloquentUserRepository implements UserRepositoryInterface
         $user = EloquentUser::where('phone', $phone)->first();
         return $user ? $this->toDomain($user) : null;
     }
-    public function save(DomainUser $user): void
-    {
-        $model = EloquentUser::find($user->getId()) ?? new EloquentUser(['id' => $user->getId()]);
-        $model->name = $user->getName();
-        $model->email = $user->getEmail();
-        $model->password = $user->getPasswordHash();
-        $model->avatar = $user->getAvatar();
-        $model->save();
-    }
+
 
     public function register(DomainUser $user): void
     {

@@ -312,8 +312,9 @@
         }
 
         function showProfile() {
-            alert('Tính năng thông tin cá nhân sẽ được triển khai sau!');
+
             document.getElementById('profileDropdown').classList.remove('show');
+            document.getElementById('profileModal').classList.add('show');
         }
 
         function logout() {
@@ -354,7 +355,7 @@
             
         </div>
         ${member.id !== data.current_user_id ? `
-                        <button class="remove-member-btn" onclick="removeMember(this, '${member.id}')">Xóa</button>` : ''}
+                            <button class="remove-member-btn" onclick="removeMember(this, '${member.id}')">Xóa</button>` : ''}
     </div>
 `).join('');
 
