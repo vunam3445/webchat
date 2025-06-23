@@ -36,7 +36,6 @@ class UserController extends Controller
         $user = Auth::user(); // Lấy user hiện tại
 
         $data = $request->only(['name', 'email']);
-        Log::info('Update profile data: ', $data);
         // Xử lý ảnh nếu có upload
         if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');
