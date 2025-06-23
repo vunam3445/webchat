@@ -430,7 +430,8 @@
             font-weight: bold;
             font-size: 16px;
         }
-        .message-avatar img{
+
+        .message-avatar img {
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -442,12 +443,19 @@
             font-weight: bold;
             font-size: 16px;
         }
+
         .user-info {
             flex: 1;
         }
 
         .user-info .name {
-            color: rgb(1, 1, 1);
+            color: rgb(203, 192, 192);
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .name.active {
+            color: rgb(23, 21, 21);
             font-weight: 500;
             margin-bottom: 2px;
         }

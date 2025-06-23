@@ -16,6 +16,8 @@
 @endsection
 @section('script')
     <script>
+        const CURRENT_USER_ID = "{{ Auth::id() }}";
+
         const input = document.getElementById('searchInput');
         const modal = document.getElementById('searchModal');
         const container = document.getElementById('resultSearch');
@@ -203,12 +205,23 @@
                             avatar: `<img src="/storage/${e.avatar}">`,
                             gradient: 'linear-gradient(45deg, #A8EDEA, #FED6E3)',
                         });
+
                     }
                 });
         } catch (e) {
             console.error('Lỗi khi khởi tạo Echo:', e);
         }
 
+        const CONVERSATION_IDS = @json(array_column($friends, 'id'));
+        CONVERSATION_IDS.forEach(convoId => {
+            Echo.channel('chat.' + convoId)
+                .listen('MessageSent', (e) => {
+                    if (e.sender_id !== CURRENT_USER_ID) {
+                        const nameEl = document.getElementById('conv-name-' + convoId);
+                        if (nameEl) nameEl.classList.add('active');
+                    }
+                });
+        });
 
         // Navbar Functions
         function toggleNotifications() {
@@ -312,7 +325,7 @@
         }
 
         function showProfile() {
-                      document.getElementById('profileDropdown').classList.remove('show');
+            document.getElementById('profileDropdown').classList.remove('show');
             document.getElementById('profileModal').classList.add('show');
         }
 
@@ -336,7 +349,7 @@
             axios.get(`/conversations/${conversationId}/info`)
                 .then(response => {
                     const data = response.data;
-
+                    const createdBy = data.createdBy;
                     // Cập nhật thông tin nhóm
                     modal.querySelector('.group-name').textContent = data.name || 'Nhóm chưa có tên';
                     modal.querySelector('.group-description').textContent = data.description || 'Chưa có mô tả';
@@ -353,8 +366,8 @@
             <div class="name">${member.id === data.current_user_id ? 'Bạn' : member.name}</div>
             
         </div>
-        ${member.id !== data.current_user_id ? `
-                        <button class="remove-member-btn" onclick="removeMember(this, '${member.id}')">Xóa</button>` : ''}
+        ${CURRENT_USER_ID == createdBy? `
+                                        <button class="remove-member-btn" onclick="removeMember(this, '${member.id}')">Xóa</button>` : ''}
     </div>
 `).join('');
 

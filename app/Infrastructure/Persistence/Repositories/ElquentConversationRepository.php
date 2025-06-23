@@ -66,6 +66,7 @@ class ElquentConversationRepository implements ConversationRepositoryInterface
             'id' => $user->id,
             'name' => $user->name,
             'avatar' => $user->avatar,
+            
         ])->toArray();
 
         $name = $conversation->type === 'private'
@@ -76,6 +77,7 @@ class ElquentConversationRepository implements ConversationRepositoryInterface
             id: $conversation->id,
             type: $conversation->type,
             name: $name,
+            createdBy: $conversation->created_by,
             participants: $participants // trả về chi tiết thay vì chỉ id
         );
     }
@@ -128,7 +130,7 @@ class ElquentConversationRepository implements ConversationRepositoryInterface
                 'conversation_id' => $conversation->id,
                 'user_id' => $userId,
                 'joined_at' => now(),
-                'role' => 'member',
+                'role' => 'admin',
                 'created_at' => now(),
                 'updated_at' => now(),
             ];

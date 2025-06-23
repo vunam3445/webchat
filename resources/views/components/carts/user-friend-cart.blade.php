@@ -1,5 +1,5 @@
 <div class="user-item"
-     onclick='window.location.href="{{ $user['type'] === 'private'
+    onclick='window.location.href="{{ $user['type'] === 'private'
         ? route('conversations.getConversation', ['id' => $user['id']])
         : route('conversations.getGroupConversation', ['id' => $user['id']]) }}"'>
 
@@ -12,6 +12,6 @@
     </div>
 
     <div class="user-info">
-        <div class="name">{{ $user['name'] }}</div>
+        <div class="name" id="conv-name-{{ $user['id'] }}">{{ $user['name'] }}</div>
     </div>
 </div>

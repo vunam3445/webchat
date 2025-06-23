@@ -7,6 +7,7 @@ class Conversation
         public string $id,
         public string $type, // 'private' or 'group'
         public ?string $name = null,
+        public ?string $createdBy = null,
         public array $participants = []
     ) {}
 }
