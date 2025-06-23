@@ -312,8 +312,7 @@
         }
 
         function showProfile() {
-
-            document.getElementById('profileDropdown').classList.remove('show');
+                      document.getElementById('profileDropdown').classList.remove('show');
             document.getElementById('profileModal').classList.add('show');
         }
 
@@ -355,7 +354,7 @@
             
         </div>
         ${member.id !== data.current_user_id ? `
-                            <button class="remove-member-btn" onclick="removeMember(this, '${member.id}')">Xóa</button>` : ''}
+                        <button class="remove-member-btn" onclick="removeMember(this, '${member.id}')">Xóa</button>` : ''}
     </div>
 `).join('');
 
