@@ -7,7 +7,7 @@
 - Chat 1-1 và nhóm
 - Tạo nhóm chat
 - Gửi/nhận tin nhắn realtime với Pusher
-
+- Được xây dựng theo mô hình Clean Architecture và các nguyên tắc thiết kế SOLID
 ## 🛠️ Công nghệ sử dụng
 
 - **Laravel** (Framework PHP)

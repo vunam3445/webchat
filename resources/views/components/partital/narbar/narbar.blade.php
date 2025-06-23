@@ -48,7 +48,9 @@
 
          <!-- User Profile -->
          <div class="user-profile">
-             <div class="profile-avatar" onclick="toggleProfileMenu()">B</div>
+             <div class="user-avatar" onclick="toggleProfileMenu()"> 
+                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="avatar">
+             </div>
              <div class="dropdown" id="profileDropdown">
                  <div class="dropdown-item" onclick="showChangePassword()">🔑 Đổi mật khẩu</div>
                  <div class="dropdown-item" onclick="showForgotPassword()">❓ Quên mật khẩu</div>
@@ -93,4 +95,5 @@
          </div>
      </div>
  </div>
- 
+
+ <x-modals.personalInfo />

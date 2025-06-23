@@ -62,4 +62,6 @@ Route::middleware('auth')->group(function () {
     Broadcast::channel('chat.{conversationId}', function ($user, $conversationId) {
         return true; // hoặc kiểm tra quyền truy cập nếu cần
     });
+
+    Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 });

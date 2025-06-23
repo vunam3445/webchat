@@ -110,14 +110,13 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 16px;
         }
 
         .profile-avatar:hover {
@@ -129,7 +128,7 @@
             position: absolute;
             top: 100%;
             right: 0;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(254, 254, 254, 0.9);
             backdrop-filter: blur(20px);
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1026,6 +1025,9 @@
 
     @include('components.modals.groupInfo')
     @yield('script')
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>
